@@ -28,7 +28,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: ./Dockerfile
+          file: ./docker_ex/app_api/Dockerfile
           push: true
           # Remplace 'DOCKERHUB_USERNAME' par ton pseudo Docker Hub
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/test:latest, ${{ secrets.DOCKERHUB_USERNAME }}/test:${{ github.sha }}
