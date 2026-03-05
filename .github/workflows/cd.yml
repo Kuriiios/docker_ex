@@ -1,4 +1,4 @@
-name:  Continuous Deployment (Docker Push)
+name: Continuous Deployment (Docker Push)
 
 on:
   workflow_run:
