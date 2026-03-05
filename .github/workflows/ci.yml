@@ -1,0 +1,36 @@
+name: CI Quality Check
+
+on:
+  push:
+    branches: [ main, dev ]
+  pull_request:
+    branches: [ main ]        # Se déclenche quand on veut merger vers main
+
+jobs:
+  test-and-lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: true
+
+      - name: Set up Python
+        run: uv python install 3.12
+
+      - name: Install dependencies
+        run: uv sync --dev
+
+      - name: Lint with Ruff
+        # On fait le check (erreurs) et le format (style)
+        run: |
+          uv run ruff check --fix .
+          uv run ruff format .
+
+      - name: Run Tests with Pytest
+        # On lance les tests sur le dossier tests/ en ciblant src/
+        run: uv run pytest --cov=src tests/
