@@ -773,9 +773,6 @@ dev = [
     { name = "ruff" },
 ]
 
-[tool.ruff.lint.per-file-ignores]
-"docs/source/conf.py" = ["PLR0913"]
-
 [package.metadata]
 requires-dist = [
     { name = "docutils", marker = "extra == 'docs'", specifier = "<0.21" },
