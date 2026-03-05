@@ -95,5 +95,6 @@ members = [
 [dependency-groups]
 dev = [
     "pytest>=7.4.4",
+    "pytest-cov>=6.3.0",
     "ruff>=0.12.12",
 ]
