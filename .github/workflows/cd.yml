@@ -5,8 +5,7 @@ on:
     workflows: ["CI Quality Check"] # Doit correspondre exactement au 'name' dans ci.yml
     types:
       - completed
-    branches:
-      - main
+    branches: [main, dev]
 
 jobs:
   build-and-push:
