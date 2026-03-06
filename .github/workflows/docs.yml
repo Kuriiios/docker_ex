@@ -3,7 +3,7 @@ name: Deploy Documentation
 
 on:
   push:
-    branches: [main, dev] # Se lance à chaque fois que tu push sur main
+    branches: [main] # Se lance à chaque fois que tu push sur main
 
 
 permissions:

@@ -1,30 +1,48 @@
-ARG BASE_IMAGE=python:3.9-slim
-FROM $BASE_IMAGE as runtime-environment
+# Use the official UV image with Python 3.12
+FROM python3.12-bookworm-slim
 
-# update pip and install uv
-RUN python -m pip install -U "pip>=21.2"
-RUN pip install uv
+# Set the working directory
+WORKDIR /app
 
-# install project requirements
-COPY requirements.txt /tmp/requirements.txt
-RUN uv pip install --system --no-cache-dir -r /tmp/requirements.txt && rm -f /tmp/requirements.txt
+# Enable bytecode compilation for faster startup
+ENV UV_COMPILE_BYTECODE=1
 
-# add kedro user
-ARG KEDRO_UID=999
-ARG KEDRO_GID=0
-RUN groupadd -f -g ${KEDRO_GID} kedro_group && \
-    useradd -m -d /home/kedro_docker -s /bin/bash -g ${KEDRO_GID} -u ${KEDRO_UID} kedro_docker
+# Copy the lockfile and pyproject.toml files first to leverage caching
+# We include the sub-project pyprojects because they are part of the workspace
+COPY uv.lock pyproject.toml ./
+COPY docker_ex/app_front/pyproject.toml ./docker_ex/app_front/
+COPY docker_ex/app_api/pyproject.toml ./docker_ex/app_api/
 
-WORKDIR /home/kedro_docker
-USER kedro_docker
+# Install the dependencies without installing the actual project code yet
+# This layer is cached unless your dependencies change
+RUN uv sync --frozen --no-install-project --no-dev
 
-FROM runtime-environment
+# Copy the rest of the source code
+COPY . .
 
-# copy the whole project except what is in .dockerignore
-ARG KEDRO_UID=999
-ARG KEDRO_GID=0
-COPY --chown=${KEDRO_UID}:${KEDRO_GID} . .
+# Now install the project (this links your workspace members)
+RUN uv sync --frozen --no-dev
+
+# --- Final Runtime Stage ---
+FROM python:3.12-slim-bookworm
+
+WORKDIR /app
+
+# Add kedro user for security
+RUN groupadd -r kedro && useradd -r -g kedro kedro_user
+
+# Copy the virtual environment from the builder
+COPY --from=builder /app/.venv /app/.venv
+
+# Copy the source code
+COPY --from=builder --chown=kedro_user:kedro /app /app
+
+# Set the PATH to use the virtual environment
+ENV PATH="/app/.venv/bin:$PATH"
+
+USER kedro_user
 
 EXPOSE 8888
 
+# The project.scripts section in your toml defines "docker-ex"
 CMD ["kedro", "run"]

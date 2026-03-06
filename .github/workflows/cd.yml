@@ -1,4 +1,4 @@
-name:  Continuous Deployment (Docker Push)
+name: Continuous Deployment (Docker Push)
 
 on:
   workflow_run:
@@ -11,6 +11,10 @@ jobs:
   build-and-push:
     runs-on: ubuntu-latest
     steps:
+      - name: Setup github actions
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12' 
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -23,11 +27,13 @@ jobs:
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+        
 
       - name: Build and Push
         uses: docker/build-push-action@v6
         with:
           context: .
+          file: ./docker_ex/app_api/Dockerfile
           push: true
           # Remplace 'DOCKERHUB_USERNAME' par ton pseudo Docker Hub
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/test:latest, ${{ secrets.DOCKERHUB_USERNAME }}/test:${{ github.sha }}
