@@ -1,5 +1,6 @@
 from fastapi import Depends, FastAPI
-from modules import connect, crud, schemas
+from models import models
+from modules import connect, crud
 from sqlalchemy.orm import Session
 
 # Initialize Database
@@ -11,11 +12,11 @@ app = FastAPI(title="Streamlit Backend API")
 def read_root():
     return {"status": "API is running"}
 
-@app.get("/items", response_model=list[schemas.Item])
+@app.get("/items", response_model=list[models.Item])
 def read_items(db: Session = Depends(connect.get_db)):
     return crud.get_items(db)
 
-@app.post("/items", response_model=schemas.Item)
-def create_item(item: schemas.ItemCreate, db: Session = Depends(connect.get_db)):
+@app.post("/items", response_model=models.Item)
+def create_item(item: models.ItemCreate, db: Session = Depends(connect.get_db)):
     return crud.create_item(db=db, item=item)
 

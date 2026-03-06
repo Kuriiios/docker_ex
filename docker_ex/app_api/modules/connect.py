@@ -7,7 +7,7 @@ from sqlalchemy.orm import sessionmaker
 
 load_dotenv()
 
-POSTGRES_PASSWORD = os.get_env("POSTGRES_PASSWORD")
+POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD")
 
 SQLALCHEMY_DATABASE_URL = "postgresql://postgres:password@localhost:5432/my_database"
 
