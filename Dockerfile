@@ -1,5 +1,5 @@
 # Use the official UV image with Python 3.12
-FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim AS builder
+FROM python3.12-bookworm-slim
 
 # Set the working directory
 WORKDIR /app
